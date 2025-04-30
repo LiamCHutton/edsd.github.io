@@ -1,0 +1,61 @@
+﻿@using EDStationDatabase.Models.Category
+@model StationBookmark
+@{
+    ViewBag.Title = $"{ViewBag.Action}";
+}
+<h2>@ViewBag.Action</h2>
+<form asp-controller="StationBookmarks" asp-action="Edit" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    @* Station Name *@
+    <div class="mb-3">
+        <label asp-for="StationName" class="form-label">Station Name</label>
+        <input asp-for="StationName" class="form-control" />
+    </div>
+
+    @* System Name *@
+    <div class="mb-3">
+        <label asp-for="SystemName" class="form-label">System Name</label>
+        <input asp-for="SystemName" class="form-control" />
+    </div>
+
+    @* Economy *@
+    <div class="mb-3">
+        <label asp-for="EconomyId" class="form-label">Economy</label>
+        <select asp-for="EconomyId" class="form-control">
+            <option value="">-- Select Economy --</option>
+            @foreach (var category in ViewBag.Economies)
+            {
+                <option value="@category.EconomyId">@category.EconomyName</option>
+            }
+        </select>
+    </div>
+
+    @* Allegiance *@
+    <div class="mb-3">
+        <label asp-for="AllegianceId" class="form-label">Allegiance</label>
+        <select asp-for="AllegianceId" class="form-control">
+            <option value="">-- Select Allegiance (Powerplay) --</option>
+            @foreach (var category in ViewBag.Allegiances)
+            {
+                <option value="@category.AllegianceId">@category.AllegianceName</option>
+            }
+        </select>
+    </div>
+
+    @* Station Type *@
+    <div class="mb-3">
+        <label asp-for="StationTypeId" class="form-label">Station Type</label>
+        <select asp-for="StationTypeId" class="form-control">
+            <option value="">-- Select Station Type --</option>
+            @foreach (var category in ViewBag.StationTypes)
+            {
+                <option value="@category.StationTypeId">@category.StationTypeName</option>
+            }
+        </select>
+    </div>
+
+    <input type="hidden" asp-for="StationBookmarkId" />
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-controller="StationBookmarks" asp-action="Bookmarks" class="btn btn-secondary">Cancel</a>
+</form>

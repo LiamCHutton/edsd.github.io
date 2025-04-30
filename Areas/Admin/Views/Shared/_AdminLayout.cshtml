@@ -1,0 +1,64 @@
+﻿@using Microsoft.AspNetCore.Identity
+@inject SignInManager<User> signInManager
+
+@{
+    Layout = "_Layout";
+}
+
+<header>
+    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-primary box-shadow mb-3">
+        <div class="container-fluid">
+            <a class="navbar-brand text-white fw-bold" asp-area="Admin" asp-controller="Home" asp-action="Index">EDStationDatabase</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <ul class="navbar-nav flex-grow-1">
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="" asp-controller="Edsm" asp-action="GetStationsInSystem" asp-route-systemName="Sol">Search Stations</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link text-white" asp-area="Admin" asp-controller="StationBookmarks" asp-action="bookmarks">Station Bookmarks Admin</a>
+                    </li>
+                    @if (signInManager.IsSignedIn(User))
+                    {
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="Admin" asp-controller="User" asp-action="Index">Manage Users</a>
+                            </li>
+                        }
+                        <li class="nav-item ms-auto">
+                            <div class="d-flex align-items-center">
+                                <span class="text-light me-2">Welcome, @User.Identity.Name</span>
+                                <form method="post" asp-action="Logout" asp-controller="Account" asp-area="">
+                                    <input type="submit" value="Log Out" class="nav-link text-white" />
+                                </form>
+                            </div>
+                        </li>
+                    }
+                    else
+                    {
+                        var action = ViewContext.RouteData.Values["action"]?.ToString();
+
+                        <li class="nav-item ms-auto @(action == "Register" ? "active" : "")">
+                            <a asp-action="Register" asp-controller="Account" asp-area="" class="nav-link text-white">Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a asp-action="Login" asp-controller="Account" asp-area="" class="nav-link text-white">Log In</a>
+                        </li>
+                    }
+                </ul>
+            </div>
+        </div>
+    </nav>
+</header>
+<div class="container">
+    <main role="main" class="pb-3">
+        @RenderBody()
+    </main>
+</div>

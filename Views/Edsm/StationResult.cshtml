@@ -1,0 +1,297 @@
+﻿@model StationListViewModel
+
+@{
+    ViewData["Title"] = "Stations in " + Model.Name;
+}
+
+<h2>
+    @if (Model.IsMultiSystemSearch)
+    {
+        <span>Stations matching criteria in @Model.Name and nearby systems</span>
+    }
+    else if (Model.IncludesNearbyStations)
+    {
+        <span>Stations in @Model.Name and nearby systems (within @Model.SearchRadius ly)</span>
+    }
+    else
+    {
+        <span>Stations in @Model.Name</span>
+    }
+</h2>
+
+<div class="alert alert-info mb-3">
+    Showing @Model.Stations.Count out of @Model.TotalStationCount total stations
+    @if (Model.Stations.Count >= 50)
+    {
+        <span>(limited to 50 stations)</span>
+    }
+</div>
+
+<!-- Filter Form -->
+<div class="card mb-4">
+    <div class="card-header">
+        <h3 class="mt-1">Filter Stations</h3>
+    </div>
+    <div class="card-body">
+        <form method="get" action="/Edsm/GetStationsInSystem">
+
+            <!-- Validation Summary -->
+            <div class="text-danger">
+                @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+            </div>
+
+            <!-- Search System -->
+            <div class="row mb-3">
+                <div class="col-md-6 position-relative">
+                    <label for="systemSearch" class="form-label">System Name</label>
+                    <input type="text" class="form-control" name="systemName" id="systemSearch" placeholder="Enter a system name" autocomplete="off" value="@Model.Name" />
+                    <div id="systemSuggestions" class="list-group position-absolute z-3" style="width: 100%;"></div>
+                </div>
+                @* <div class="col-md-6 position-relative">
+                    <label for="stationName" class="form-label">Station Name</label>
+                    <input type="text" class="form-control" name="stationName" id="stationName" placeholder="Search for station by name" value="@Context.Request.Query["stationName"]" />
+                    <div id="stationSuggestions" class="list-group position-absolute z-3" style="width: 100%;"></div>
+                </div> *@
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="hasMarket" value="true" id="hasMarket" @(Context.Request.Query["hasMarket"] == "true" ? "checked" : "") />
+                        <label class="form-check-label" for="hasMarket">Has Market</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="hasShipyard" value="true" id="hasShipyard" @(Context.Request.Query["hasShipyard"] == "true" ? "checked" : "") />
+                        <label class="form-check-label" for="hasShipyard">Has Shipyard</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="hasOutfitting" value="true" id="hasOutfitting" @(Context.Request.Query["hasOutfitting"] == "true" ? "checked" : "") />
+                        <label class="form-check-label" for="hasOutfitting">Has Outfitting</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="includeFleetCarriers" value="true" id="includeFleetCarriers" @(Context.Request.Query["includeFleetCarriers"] == "true" ? "checked" : "") />
+                        <label class="form-check-label" for="includeFleetCarriers">Include Fleet Carriers</label>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="includeNearbyStations" value="true" id="includeNearbyStations" @(Context.Request.Query["includeNearbyStations"] == "true" ? "checked" : "") />
+                        <label class="form-check-label" for="includeNearbyStations">Include Nearby Systems</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label for="stationType" class="form-label">Station Type</label>
+                    @* Preserve selected value *@
+                    @{
+                        var stationType = Context.Request.Query["stationType"].ToString();
+                    }
+                    <select class="form-select" name="stationType" id="stationType">
+                        <option value="">All Types</option>
+                        <option value="Coriolis Starport" selected="@(stationType == "Coriolis Starport")">Coriolis Starport</option>
+                        <option value="Ocellus Starport" selected="@(stationType == "Ocellus Starport")">Ocellus Starport</option>
+                        <option value="Orbis Starport" selected="@(stationType == "Orbis Starport")">Orbis Starport</option>
+                        <option value="Outpost" selected="@(stationType == "Outpost")">Outpost</option>
+                        <option value="Planetary Port" selected="@(stationType == "Planetary Port")">Planetary Port</option>
+                        <option value="Planetary Outpost" selected="@(stationType == "Planetary Outpost")">Planetary Outpost</option>
+                        <option value="Fleet Carrier" selected="@(stationType == "Fleet Carrier")">Fleet Carrier</option>
+                        <option value="Asteroid Base" selected="@(stationType == "Asteroid Base")">Asteroid Base</option>
+                        <option value="Mega ship" selected="@(stationType == "Mega ship")">Mega Ship</option>
+                        <option value="Odyssey Settlement" selected="@(stationType == "Odyssey Settlement")">Odyssey Settlement</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="government" class="form-label">Government</label>
+                    @* Preserve selected value *@
+                    @{
+                        var government = Context.Request.Query["government"].ToString();
+                    }
+                    <select class="form-select" name="government" id="government">
+                        <option value="">All Governments</option>
+                        <option value="Democracy" selected="@(government == "Democracy")">Democracy</option>
+                        <option value="Corporate" selected="@(government == "Corporate")">Corporate</option>
+                        <option value="Patronage" selected="@(government == "Patronage")">Patronage</option>
+                        <option value="Dictatorship" selected="@(government == "Dictatorship")">Dictatorship</option>
+                        <option value="Federation" selected="@(government == "Federation")">Federation</option>
+                        <option value="Confederacy" selected="@(government == "Confederacy")">Confederacy</option>
+                    </select>
+                </div>
+
+                <div class="col-md-4">
+                    <label for="economy" class="form-label">Economy</label>
+                    @* Preserve selected value *@
+                    @{
+                        var economy = Context.Request.Query["economy"].ToString();
+                    }
+
+                    <select class="form-select" name="economy" id="economy">
+                        <option value="">All Economies</option>
+                        <option value="Industrial" selected="@(economy == "Industrial")">Industrial</option>
+                        <option value="High Tech" selected="@(economy == "High Tech")">High Tech</option>
+                        <option value="Agricultural" selected="@(economy == "Agricultural")">Agriculture</option>
+                        <option value="Tourism" selected="@(economy == "Tourism")">Tourism</option>
+                        <option value="Military" selected="@(economy == "Military")">Military</option>
+                        <option value="Extraction" selected="@(economy == "Extraction")">Extraction</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-4">
+                    <label for="maxDistance" class="form-label">Max Distance from Star (ls)</label>
+                    <input type="number" class="form-control" name="maxDistance" id="maxDistance" placeholder="No limit" value="@Context.Request.Query["maxDistance"]" />
+                </div>
+
+                <div class="col-md-4" id="radiusContainer">
+                    <label for="radius" class="form-label">Search Radius (ly)</label>
+                    <input type="number" class="form-control" name="radius" id="radius" placeholder="100 (max 100 LY)" value="@(Context.Request.Query["radius"].Count > 0 ? Context.Request.Query["radius"][0] : "100")" disabled />
+                </div>
+
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary">Apply Filters</button>
+                    <a href="/Edsm/GetStationsInSystem?systemName=@Model.Name" class="btn btn-outline-secondary ms-2">Clear Filters</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Results Table -->
+@if (Model.Stations != null && Model.Stations.Any())
+{
+    <div class="table-responsive">
+        <table class="table border border-black table-striped mb-0 text-center align-middle">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    @if (Model.IsMultiSystemSearch || Model.IncludesNearbyStations)
+                    {
+                        <th>System</th>
+                        <th>Distance (ly)</th>
+                    }
+                    <th>Type</th>
+                    <th>Government</th>
+                    <th>Allegiance</th>
+                    <th>Economy</th>
+                    <th>Market</th>
+                    <th>Shipyard</th>
+                    <th>Outfitting</th>
+                    <th>Distance to Arrival (ls)</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                <!-- Station rows -->
+                @foreach (var station in Model.Stations)
+                {
+                    <tr>
+                        <td class="text-center align-middle p-3">
+                            @if (station.Type == "Coriolis Starport")
+                            {
+                                <img src="~/images/CoriolisIcon.png" alt="Coriolis Station" class="station-type-image stationIcon" />
+                            }
+                            else if (station.Type == "Orbis Starport")
+                            {
+                                <img src="~/images/OrbisIcon.png" alt="Orbis Station" class="station-type-image stationIcon" />
+                            }
+                            else if (station.Type == "Ocellus Starport")
+                            {
+                                <img src="~/images/OcellusIcon.png" alt="Ocellus Station" class="station-type-image stationIcon" />
+                            }
+                            else if (station.Type == "Outpost")
+                            {
+                                <img src="~/images/OutpostIcon.png" alt="Outpost" class="station-type-image stationIcon" />
+                            }
+                            else if (station.Type == "Asteroid Base")
+                            {
+                                <img src="~/images/AsteroidStationIcon.png" alt="Asteroid Base" class="station-type-image stationIcon" />
+                            }
+                            else if (station.Type == "Planetary Outpost")
+                            {
+                                <img src="~/images/PlanetaryOutpostIcon.png" alt="Planetary Outpost" class="station-type-image stationIcon" />
+                            }
+                            else if (station.Type == "Planetary Port")
+                            {
+                                <img src="~/images/SurfacePortIcon.png" alt="Planetary Port" class="station-type-image stationIcon" />
+                            }
+                            else if (station.Type == "Fleet Carrier")
+                            {
+                                <img src="~/images/FleetCarrierIcon.png" alt="Fleet Carrier" class="station-type-image stationIcon" />
+                            }
+                            else if (station.Type == "Mega ship")
+                            {
+                                <img src="~/images/MegashipIcon.png" alt="Mega Ship" class="station-type-image stationIcon" />
+                            }
+                            else if (station.Type == "Odyssey Settlement")
+                            {
+                                <img src="~/images/SettlementIcon.png" alt="Odyssey Settlement" class="station-type-image stationIcon" />
+                            }
+                            else
+                            {
+                                <img src="~/images/DefaultStationIcon.png" alt="Default Station" class="station-type-image stationIcon" />
+                            }
+                            @station.Name
+                        </td>
+
+                        @if (Model.IsMultiSystemSearch || Model.IncludesNearbyStations)
+                        {
+                            <td>
+                                <a href="/Edsm/GetStationsInSystem?systemName=@Uri.EscapeDataString(station.SystemName)" class="text-decoration-none">@station.SystemName</a>
+                            </td>
+                            <td>@(station.DistanceFromReference?.ToString("N1") ?? "N/A") Ly</td>
+                        }
+
+                        <td>@station.Type</td>
+                        <td>@station.Government</td>
+                        <td>@station.Allegiance</td>
+                        <td>@station.Economy</td>
+                        <td>@(station.HasMarket ? "🟢" : "🔴")</td>
+                        <td>@(station.HasShipyard ? "🟢" : "🔴")</td>
+                        <td>@(station.HasOutfitting ? "🟢" : "🔴")</td>
+                        <td>@(station.DistanceToArrival?.ToString("N0") ?? "N/A") Ls</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}
+else
+{
+    <div class="alert alert-info">No stations found matching your criteria.</div>
+}
+
+@section Scripts {
+    <script src="~/js/systemSearch.js"></script>
+    <script src="~/js/stationSearch.js"></script>
+
+    <script>
+        // Show/hide the radius input based on whether nearby stations are included
+        $(document).ready(function() {
+            const includeNearbyCheckbox = $('#includeNearbyStations');
+            const radiusContainer = $('#radiusContainer');
+
+            // Initial state
+            if (!@Model.IsMultiSystemSearch.ToString().ToLower() && !@Model.IncludesNearbyStations.ToString().ToLower()) {
+                radiusContainer.hide();
+            }
+
+            // Toggle on checkbox change
+            includeNearbyCheckbox.change(function() {
+                if (this.checked) {
+                    radiusContainer.show();
+                } else if (!@Model.IsMultiSystemSearch.ToString().ToLower()) {
+                    radiusContainer.hide();
+                }
+            });
+        });
+    </script>
+}

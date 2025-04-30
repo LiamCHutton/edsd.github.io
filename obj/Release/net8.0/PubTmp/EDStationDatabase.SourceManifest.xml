@@ -1,0 +1,5 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<sitemanifest>
+  <IisApp path="C:\Users\liamh\OneDrive\Documents\GitHub\awd1115-coursework-LiamCHutton\FinalProject\FinalProject v1\EDStationDatabase\obj\Release\net8.0\PubTmp\Out\" />
+  <dbfullsql path="C:\Users\liamh\OneDrive\Documents\GitHub\awd1115-coursework-LiamCHutton\FinalProject\FinalProject v1\EDStationDatabase\obj\Release\net8.0\PubTmp\EFSQLScripts\EDStationDatabase.Models.EDAssetsContext.sql" />
+</sitemanifest>

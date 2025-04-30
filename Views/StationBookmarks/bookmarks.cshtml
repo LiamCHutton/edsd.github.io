@@ -1,0 +1,105 @@
+﻿@using EDStationDatabase.Models;
+@using EDStationDatabase.Models.ViewModels;
+
+@model BookmarkViewModel
+
+@{
+    var successMessage = ViewBag.SuccessMessage as string;
+}
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="bg-success text-white p-3 text-center mt-3 rounded">
+        <h2>@TempData["successMessage"]</h2>
+    </div>
+}
+
+<div class="card-header text-center bg-primary border border-black rounded-top">
+    <h1 class="mt-2">Station Bookmarks</h1>
+</div>
+
+<table class="table table-bordered table-striped mb-0">
+    <thead>
+        <tr>
+            <th>Station Name</th>
+            <th>System Name</th>
+            <th>Economy</th>
+            <th>Allegiance & Superpower</th>
+            <th>Station Type</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var bookmark in Model.StationBookmark)
+        {
+            <tr>
+                <td class="text-center align-middle">
+                    @if (bookmark.StationType?.StationTypeName == "Coriolis")
+                    {
+                        <img src="~/images/CoriolisIcon.png" alt="Coriolis Station" class="station-type-image stationIcon" />
+                    }
+                    else if (bookmark.StationType?.StationTypeName == "Orbis")
+                    {
+                        <img src="~/images/OrbisIcon.png" alt="Orbis Station" class="station-type-image stationIcon" />
+                    }
+                    else if (bookmark.StationType?.StationTypeName == "Ocellus")
+                    {
+                        <img src="~/images/OcellusIcon.png" alt="Ocellus Station" class="station-type-image stationIcon" />
+                    }
+                    else if (bookmark.StationType?.StationTypeName == "Outpost")
+                    {
+                        <img src="~/images/OutpostIcon.png" alt="Outpost" class="station-type-image stationIcon" />
+                    }
+                    else if (bookmark.StationType?.StationTypeName == "Asteroid Base")
+                    {
+                        <img src="~/images/AsteroidStationIcon.png" alt="Asteroid Base" class="station-type-image stationIcon" />
+                    }
+                    else if (bookmark.StationType?.StationTypeName == "Planetary Outpost")
+                    {
+                        <img src="~/images/SettlementIcon.png" alt="Planetary Outpost" class="station-type-image stationIcon" />
+                    }
+                    else if (bookmark.StationType?.StationTypeName == "Planetary Port")
+                    {
+                        <img src="~/images/SurfacePortIcon.png" alt="Planetary Port" class="station-type-image stationIcon" />
+                    }
+                    @bookmark.StationName
+                </td>
+                <td>@bookmark.SystemName</td>
+                <td>@bookmark.Economy?.EconomyName</td>
+                <td>
+                    @bookmark.Allegiance?.AllegianceName
+                    @if (bookmark.AllegianceId.HasValue && Model.AllegianceWithSuperpower.ContainsKey(bookmark.AllegianceId.Value))
+                    {
+                        <br />
+                        <p>@Model.AllegianceWithSuperpower[bookmark.AllegianceId.Value]</p>
+                    }
+                </td>
+                <td>@bookmark.StationType?.StationTypeName</td>
+            </tr>
+        }
+    </tbody>
+</table>
+<div class="card-footer text-center bg-primary border border-black rounded-bottom">
+    <nav aria-label="Page navigation" class="p-2">
+        <ul class="pagination justify-content-center mb-0">
+            @if (Model.CurrentPage > 1)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Bookmarks" asp-route-page="@(Model.CurrentPage - 1)">Previous</a>
+                </li>
+            }
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class="page-link" asp-action="Bookmarks" asp-route-page="@i">@i</a>
+                </li>
+            }
+            @if (Model.CurrentPage < Model.TotalPages)
+            {
+                <li class="page-item">
+                    <a class="page-link" asp-action="Bookmarks" asp-route-page="@(Model.CurrentPage + 1)">Next</a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>
+

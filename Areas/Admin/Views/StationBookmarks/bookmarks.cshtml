@@ -1,0 +1,80 @@
+﻿@using EDStationDatabase.Models.Category
+@model List<StationBookmark>
+
+@{
+    var successMessage = ViewBag.SuccessMessage as string;
+}
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="bg-success text-white p-3 text-center mt-3 rounded">
+        <h2>@TempData["successMessage"]</h2>
+    </div>
+}
+
+<div class="card-header text-center bg-primary border border-black rounded-top">
+    <h1 class="mt-2">Station Bookmarks</h1>
+</div>
+
+<table class="table table-bordered table-striped mb-0">
+    <thread>
+        <tr class="text-center align-middle">
+            <th>Station Name</th>
+            <th>System Name</th>
+            <th>Economy</th>
+            <th>Allegiance</th>
+            <th>Station Type</th>
+            <th></th>
+        </tr>
+    </thread>
+    <tbody>
+        @foreach (var bookmark in Model)
+        {
+            <tr class="text-center align-middle">
+                <td>
+                    @if (bookmark.StationType?.StationTypeName == "Coriolis")
+                    {
+                        <img src="~/images/CoriolisIcon.png" alt="Coriolis Station" class="station-type-image stationIcon" />
+                    }
+                    else if (bookmark.StationType?.StationTypeName == "Orbis")
+                    {
+                        <img src="~/images/OrbisIcon.png" alt="Orbis Station" class="station-type-image stationIcon" />
+                    }
+                    else if (bookmark.StationType?.StationTypeName == "Ocellus")
+                    {
+                        <img src="~/images/OcellusIcon.png" alt="Ocellus Station" class="station-type-image stationIcon" />
+                    }
+                    else if (bookmark.StationType?.StationTypeName == "Outpost")
+                    {
+                        <img src="~/images/OutpostIcon.png" alt="Outpost" class="station-type-image stationIcon" />
+                    }
+                    else if (bookmark.StationType?.StationTypeName == "Asteroid Base")
+                    {
+                        <img src="~/images/AsteroidStationIcon.png" alt="Asteroid Base" class="station-type-image stationIcon" />
+                    }
+                    else if (bookmark.StationType?.StationTypeName == "Planetary Outpost")
+                    {
+                        <img src="~/images/SettlementIcon.png" alt="Planetary Outpost" class="station-type-image stationIcon" />
+                    }
+                    else if (bookmark.StationType?.StationTypeName == "Planetary Port")
+                    {
+                        <img src="~/images/SurfacePortIcon.png" alt="Planetary Port" class="station-type-image stationIcon" />
+                    }
+                    @bookmark.StationName
+                </td>
+                <td>@bookmark.SystemName</td>
+                <td>@bookmark.Economy?.EconomyName</td>
+                <td>@bookmark.Allegiance?.AllegianceName</td>
+                <td>@bookmark.StationType?.StationTypeName</td>
+                <td>
+                    <a asp-controller="StationBookmarks" asp-action="Edit" asp-route-id="@bookmark.StationBookmarkId" class="btn btn-primary">Edit</a>
+                    <a asp-controller="StationBookmarks" asp-action="Delete" asp-route-id="@bookmark.StationBookmarkId" class="btn btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div class="card-footer text-center bg-primary border border-black rounded-bottom p-2">
+    <a asp-controller="StationBookmarks" asp-action="Add" class="btn btn-primary">Add Station</a>
+</div>

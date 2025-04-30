@@ -1,0 +1,13 @@
+﻿@using EDStationDatabase.Models.Category
+@model StationBookmark
+@{
+    ViewBag.Title = $"{ViewBag.Action}";
+}
+
+<h2>Confirm Deletion</h2>
+<h3>@Model.StationName</h3>
+<form asp-controller="StationBookmarks" asp-action="Delete" method="post">
+    <input type="hidden" asp-for="StationBookmarkId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-controller="StationBookmarks" asp-action="Bookmarks" class="btn btn-secondary">Cancel</a>
+</form>

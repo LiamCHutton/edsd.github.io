@@ -1,0 +1,43 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="container vh-100 d-flex align-items-center">
+    <div class="row w-100">
+        <div class="col-md-6 d-flex justify-content-center align-items-center">
+            <div class="text-center p-3 border border-black rounded-2 bg-secondary bg-opacity-50">
+                <h1 class="display-4 fw-bold text-white">Elite Dangerous<br />Station Database</h1>
+                <p>College final project</p>
+            </div>
+        </div>
+
+        @* Cards *@
+        @* Search Stations *@
+        <div class="col-md-6 d-flex flex-column align-items-center">
+            @* Search Stations *@
+            <div class="card mb-3 w-100">
+                <a asp-controller="Edsm" asp-action="GetStationsInSystem" asp-route-systemName="Sol">
+                    <h3 class="card-header">Search Stations</h3>
+                </a>
+                <div class="card-body">
+                    <h5 class="card-title">Search the galaxy for available stations</h5>
+                    <h6 class="card-subtitle text-muted">Filters will soon be added.</h6>
+                </div>
+                <a asp-controller="Edsm" asp-action="GetStationsInSystem" asp-route-systemName="Sol">
+                    <img src="images/OrbisStarport.jpg" class="card-img-top" alt="Oops, something went wrong. Please try refreshing the page.">
+                </a>
+            </div>
+
+            @* Station Bookmarks *@
+            <div class="card text-white bg-primary mb-3 w-100" style="max-width: 20rem;">
+                <div class="card-header">Station Bookmarks</div>
+                <div class="card-body p-0">
+                    <a href="/stationbookmarks/bookmarks/">
+                        <img src="images/CoriolisStarportWithPlanetRing.png" class="card-img-top w-100" alt="Oops, something went wrong. Please try refreshing the page.">  <!-- Ensure the image takes full width -->
+                    </a>
+                    <p class="card-text p-2">Featured bookmarks listed by the admin of the website.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
